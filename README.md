@@ -2,6 +2,8 @@
 
 AI Pet 是一个面向 Claude Code 和 Codex 的桌面宠物伴侣项目。目标不是做一个普通聊天机器人，而是做一个可以常驻桌面、随时调出、感知编码 agent 动作并主动提示用户的本地伴侣。
 
+完整需求见：[docs/requirements.md](docs/requirements.md)
+
 ## 项目目标
 
 最终形态：
