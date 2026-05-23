@@ -1,0 +1,16 @@
+{
+  "name": "agent-pet-companion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local desktop pet companion for Claude Code and Codex status events.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "check": "node --check src/server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {}
+}
