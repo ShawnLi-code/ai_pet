@@ -17,24 +17,50 @@ AI Pet 是一个面向 Claude Code 和 Codex 的桌面宠物伴侣项目。目�
 当前版本是第一版技术骨架，已经具备：
 
 - 本地 HTTP/WebSocket 服务，默认运行在 `http://localhost:4243`。
-- 浏览器版宠物 UI，用于验证状态展示。
+- Electron 桌面窗口：无边框、置顶、可隐藏/显示。
+- 托盘入口：可以从托盘显示/隐藏或退出。
+- 全局快捷键：`Ctrl+Shift+P` 显示/隐藏桌宠。
+- 浏览器版宠物 UI，仍可用于调试状态展示。
 - `claude-pet.ps1` 和 `codex-pet.ps1` 启动包装器：先启动宠物服务，再启动真实的 Claude Code 或 Codex。
 - `/event` 接口：外部脚本、hooks 或后续 MCP 集成都可以把 agent 事件发给宠物。
 
-当前还不是完整桌面浮窗应用。下一步会把浏览器 UI 封装成桌面常驻窗口，并增加托盘、快捷键和通知。
+当前已经是桌面化初版，但还不是最终体验。下一步会继续增加更像桌宠的浮窗交互、系统通知、拖动位置记忆和更细的 Claude Code/Codex 状态接入。
 
 ## 目录结构
 
 ```text
 src/server.js                本地 daemon，负责状态和事件分发
+src/desktop.js               Electron 桌面入口
 public/                      当前浏览器版宠物 UI
 scripts/Start-PetServer.ps1  启动宠物服务
+scripts/Start-AIPet.ps1      启动桌面宠物
 scripts/claude-pet.ps1       Claude Code 启动包装器
 scripts/codex-pet.ps1        Codex 启动包装器
 config/agents.example.json   本机命令路径示例配置
 ```
 
-## 本地运行
+## 启动桌面宠物
+
+```powershell
+npm install
+npm run desktop
+```
+
+第一次运行 Electron 时可能需要下载 Electron 二进制。如果下载很慢，先确认 Git/npm 代理可用，再重新执行 `npm run desktop`。
+
+或者：
+
+```powershell
+.\scripts\Start-AIPet.ps1
+```
+
+快捷键：
+
+```text
+Ctrl+Shift+P 显示/隐藏桌宠
+```
+
+## 仅启动本地服务
 
 ```powershell
 npm install

@@ -4,13 +4,17 @@
   "private": true,
   "description": "Local desktop pet companion for Claude Code and Codex status events.",
   "type": "module",
+  "main": "src/desktop.js",
   "scripts": {
     "start": "node src/server.js",
+    "desktop": "electron .",
     "dev": "node src/server.js",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js && node --check src/desktop.js"
   },
   "dependencies": {
     "ws": "^8.18.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "electron": "^42.2.0"
+  }
 }

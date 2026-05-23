@@ -7,7 +7,7 @@ import { WebSocketServer } from "ws";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const rootDir = normalize(join(__dirname, ".."));
 const publicDir = join(rootDir, "public");
-const port = Number(process.env.PET_PORT || 4243);
+const defaultPort = Number(process.env.PET_PORT || 4243);
 
 const state = {
   agents: {},
@@ -90,32 +90,49 @@ async function serveStatic(request, response) {
   }
 }
 
-const server = createServer(async (request, response) => {
-  if (request.method === "GET" && request.url === "/state") {
-    sendJson(response, 200, state);
-    return;
-  }
+export function startServer(options = {}) {
+  const port = Number(options.port || defaultPort);
+  const host = options.host || "127.0.0.1";
 
-  if (request.method === "POST" && request.url === "/event") {
-    try {
-      const event = applyEvent(await readJson(request));
-      broadcast(wss, { type: "event", event, state });
-      sendJson(response, 202, { ok: true, event });
-    } catch (error) {
-      sendJson(response, 400, { ok: false, error: error.message });
+  const server = createServer(async (request, response) => {
+    if (request.method === "GET" && request.url === "/state") {
+      sendJson(response, 200, state);
+      return;
     }
-    return;
-  }
 
-  await serveStatic(request, response);
-});
+    if (request.method === "POST" && request.url === "/event") {
+      try {
+        const event = applyEvent(await readJson(request));
+        broadcast(wss, { type: "event", event, state });
+        sendJson(response, 202, { ok: true, event });
+      } catch (error) {
+        sendJson(response, 400, { ok: false, error: error.message });
+      }
+      return;
+    }
 
-const wss = new WebSocketServer({ server });
+    await serveStatic(request, response);
+  });
 
-wss.on("connection", (socket) => {
-  socket.send(JSON.stringify({ type: "state", state }));
-});
+  const wss = new WebSocketServer({ server });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`Agent Pet Companion running at http://localhost:${port}`);
-});
+  wss.on("connection", (socket) => {
+    socket.send(JSON.stringify({ type: "state", state }));
+  });
+
+  return new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, host, () => {
+      server.off("error", reject);
+      console.log(`Agent Pet Companion running at http://localhost:${port}`);
+      resolve({ server, wss, url: `http://localhost:${port}`, port, host });
+    });
+  });
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  startServer().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
